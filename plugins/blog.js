@@ -6,9 +6,10 @@ function Blog() {
   req.send(null);
 
   this.posts = JSON.parse(req.responseText);
+  this.numpages = Math.ceil(this.posts.length/LIMIT) || 1;
 }
 
-Blog.prototype.internalRender = function(pages) {
+Blog.prototype.internalRender = function(numpages, current, pages) {
   var render = function(title, page) { title+"<br /><hr>\n"+page+"<br />\n<hr>" }, r = '';
 
   pages.forEach(function(x) {
@@ -55,14 +56,14 @@ Blog.prototype.singlePage = function(args) {
       post = x;
   });
 
-  this.callback(this.render([post]));
+  this.callback(this.render(this.numpages, 1, [post]));
 }
 
 Blog.prototype.renderPosts = function(args) {
   if (!args || !args.length)
-    args = [0];
+    args = [1];
 
-  this.callback(this.render(this.posts.slice(args[0], args[0]+LIMIT)));
+  this.callback(this.render(this.numpages, args[0], this.posts.slice((args[0]-1)*LIMIT, args[0]*LIMIT)));
 }
 
 var blog = new Blog;
